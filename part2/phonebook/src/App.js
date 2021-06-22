@@ -18,7 +18,6 @@ const App = () => {
   }
 
   const peopleToDisplay = persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
-  console.log(peopleToDisplay)
 
   useEffect(hook, [])
 
@@ -30,9 +29,9 @@ const App = () => {
       number: newNumber
     }
 
-    const matchingPerson = persons.filter(person => person.name === newName)
+    const matchingPersonArray = persons.filter(person => person.name === newName)
 
-    if (matchingPerson.length === 0) {
+    if (matchingPersonArray.length === 0) {
       personService
         .create(personObject)
         .then(response => {
@@ -42,8 +41,7 @@ const App = () => {
     else {
       const message = `${newName} is already in the phonebook. Would you like to update their number?`
       if(window.confirm(message)) {
-        const changedPerson = { ...matchingPerson, number: newNumber }
-        console.log(matchingPerson.id)
+        const changedPerson = { ...matchingPersonArray[0], number: newNumber }
         personService
           .update(changedPerson.id, personObject)
           .then(response => {
@@ -58,7 +56,6 @@ const App = () => {
 
   const delPerson = (person) => {
     const message = `Delete ${person.name}?`
-    console.log(person.id)
 
     if (window.confirm(message)) {
       personService
