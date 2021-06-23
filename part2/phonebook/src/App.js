@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Persons from './components/Persons.js'
 import PersonForm from './components/PersonForm.js'
 import Filter from './components/Filter.js'
+import Notification from './components/Notification.js'
 import personService from './services/persons'
 
 const App = () => {
@@ -9,6 +10,8 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
+  const [ successMessage, setSuccessMessage ] = useState(null)
+  const [ errorMessage, setErrorMessage ] = useState(null)
 
   const hook = () => {
     personService.getAll()
@@ -35,7 +38,15 @@ const App = () => {
       personService
         .create(personObject)
         .then(response => {
-          setPersons(persons.concat(personObject))
+          setPersons(persons.concat(response))
+        })
+        .then(() => {
+          setSuccessMessage(
+            `Added ${personObject.name} to the phonebook`
+          )
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 2000)
         })
     }
     else {
@@ -46,6 +57,22 @@ const App = () => {
           .update(changedPerson.id, personObject)
           .then(response => {
             setPersons(persons.map(person => person.id !== changedPerson.id ? person : response))
+          })
+          .then(() => {
+            setSuccessMessage(
+              `Updated ${changedPerson.name}'s phone number`
+            )
+            setTimeout(() => {
+              setSuccessMessage(null)
+            }, 2000)
+          })
+          .catch(() => {
+            setErrorMessage(
+              `${changedPerson.name}'s information does not exist on server`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 2000)
           })
       }
     }
@@ -63,7 +90,22 @@ const App = () => {
         .then(response => {
           setPersons(persons.filter(p => p.id !== person.id))
         })
-
+        .then(() => {
+          setSuccessMessage(
+            `Deleted ${person.name} from the phonebook`
+          )
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 2000)
+        })
+        .catch(() => {
+          setErrorMessage(
+            `${person.name}'s information does not exist on server`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 2000)
+        })
     }
   }
 
@@ -82,6 +124,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification type={'success'} message={successMessage} />
+      <Notification type={'error'} message={errorMessage} />
       <Filter
         newFilter={newFilter}
         handleFilterChange={handleFilterChange}
